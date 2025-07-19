@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Настройки</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/setting.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <div class="container">
+        <div class="main-text-block text-center"> 
+            <h1>НАСТРОЙКИ</h1>
+        </div>
+        <div class="main-setting-block">
+            <div class="setting-item">
+                <h3>ОЧКИ</h3>
+                <input type="range" min="10" max="100" value="50" class="slider" id="points-slider">
+                <span id="points-value">50</span>
+            </div>
+            <div class="setting-item">
+                <h3>ВРЕМЯ</h3>
+                <input type="range" min="5" max="120" value="60" class="slider" id="time-slider">
+                <span id="time-value">50</span>
+            </div>
+            <div class="setting-item">
+                <h3>ШТРАФЫ</h3>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="penalty-toggle" checked>
+                    <span class="toogle-box"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <h3>МУЗЫКА</h3>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="music-toggle" checked>
+                    <span class="toogle-box"></span>
+                </label>
+            </div>
+        </div>
+        <div class="button-block">
+            <button class="button-left" id="reset-btn">НОВАЯ ИГРА</button>
+            <button class="button-right" id="play-button">ИГРАТЬ</button>
+        </div>
+    </div>
+    <script src="static/js/setting.js"></script>
+</body>
+</html>

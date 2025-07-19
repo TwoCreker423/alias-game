@@ -1,0 +1,246 @@
+/* Устанавливаем основной шрифт для всего документа */
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Настройки для HTML и body, чтобы убрать скролл и зафиксировать размеры */
+html, body {
+  overflow: hidden; /* Отключает скролл на странице */
+  height: 100%; /* Фиксирует высоту на весь экран */
+  margin: 0; /* Убирает стандартные отступы браузера */
+  padding: 0; /* Убирает стандартные внутренние отступы */
+  background: #EDC7B7; /* Устанавливает фоновый цвет */
+}
+
+/* Стили для основного контейнера */
+.container {
+    display: flex; /* Включает flex-разметку */
+    flex-direction: column; /* Располагает дочерние элементы в колонку */
+    justify-content: center; /* Выравнивает элементы по центру вертикально */
+    align-items: center; /* Выравнивает элементы по центру горизонтально */
+    height: 100vh; /* Занимает всю высоту viewport */
+    width: 90%; /* Ширина 90% от родителя */
+    max-width: 400px; /* Максимальная ширина */
+    margin: 0 auto; /* Центрирует контейнер */
+    gap: 10px; /* Расстояние между дочерними элементами */
+}
+
+/* Стили для блока с заголовком */
+.main-text-block {
+    width: 90%; /* Ширина 90% от родителя */
+    height: 5vh; /* Высота 5% от viewport */
+    background: #BAB2B5; /* Фоновый цвет */
+    padding: 15px; /* Внутренние отступы */
+    border-radius: 35px 35px 10px 10px; /* Закругление углов (только сверху) */
+    box-shadow: 0 0 15px rgba(0,0,0,0.5); /* Тень блока */
+}
+
+/* Стили для центрирования текста */
+.text-center {
+    display: flex; /* Включает flex-разметку */
+    justify-content: center; /* Центрирует по горизонтали */
+    align-items: center; /* Центрирует по вертикали */
+    color: white; /* Цвет текста */
+}
+
+/* Стили для блока с командыми */
+.main-score-block {
+    width: 90%; /* Ширина 90% от родителя */
+    height: 60vh; /* Высота 60% от viewport */
+    background: #EEE2DC; /* Фоновый цвет */
+    padding: 15px; /* Внутренние отступы */
+    box-shadow: 0 0 15px rgba(0,0,0,0.5); /* Тень блока */
+    border-radius: 10px 10px 10px 10px; /* Закругление углов (только сверху) */
+    display: flex; /* Включает flex-разметку */
+    flex-direction: column;  /* Располагает элементы в колонку */
+    align-items: center; /* Центрирует по вертикали */
+    justify-content: space-around; /* Распределяет пространство между кнопками */
+}
+
+.teams-list-block {
+    width: 90%;
+    height: 40vh;
+    text-align: center;
+    background: white; /* Фоновый цвет */
+    padding: 10px; /* Внутренние отступы */
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.5); /* Тень блока */
+    border-radius: 10px 10px 10px 10px; /* Закругление углов (только сверху) */
+    overflow: hidden; /* Скрываем всё, что выходит за границы */
+}
+
+/* Контейнер для списка команд с прокруткой */
+#teamsScoresList {
+    height: 70%; /* Занимает всю высоту родителя */
+    overflow-y: auto; /* Включаем вертикальную прокрутку */
+    
+    /* Стили для скрытия скроллбара в разных браузерах */
+    scrollbar-width: none; /* Для Firefox */
+    -ms-overflow-style: none; /* Для IE и Edge */
+}
+
+/* Скрываем скроллбар в WebKit (Chrome, Safari) */
+#teamsScoresList::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    background: transparent;
+}
+
+.team-score-item {
+    display: flex;
+    justify-content: space-between; /* Распределяет пространство между элементами */
+    align-items: center;
+    margin: 5px 0;
+    font-size: 1.2em;
+    background-color: rgba(255, 87, 255, 0.1);
+    padding: 5px 10px;
+    border-radius: 4px;
+    width: 100%; /* Занимает всю ширину родителя */
+    box-sizing: border-box; /* Учитывает padding в ширине */
+}
+
+.team-name {
+    text-align: left;
+}
+
+.team-score {
+    text-align: right;
+    font-weight: bold;
+}
+
+.current-team {
+    font-weight: bold;
+    color: #FF5722; /* Оранжевый цвет для выделения */
+    background-color: rgba(255, 87, 34, 0.1); /* Легкий фон */
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+.current-team .team-name,
+.current-team .team-score {
+    color: #FF5722;
+}
+
+.next-team-block {
+    text-align: center;
+}
+
+.score-block {
+    display: flex; /* Включает flex-разметку */
+    flex-direction: row;  /* Располагает элементы в строку */
+    padding: 5px;
+}
+
+.score-block h3 {
+    margin: 10px;
+}
+
+/* Стили для блока с кнопками */
+.button-block {
+    width: 90%; /* Ширина 90% от родителя */
+    height: 10vh; /* Высота 10% от viewport */
+    background: #BAB2B5; /* Фоновый цвет */
+    padding: 15px; /* Внутренние отступы */
+    display: flex; /* Включает flex-разметку */
+    justify-content: space-around; /* Распределяет пространство между кнопками */
+    align-items: center; /* Центрирует по вертикали */
+    border-radius: 10px 10px 35px 35px; /* Закругление углов (только снизу) */
+    box-shadow: 0 0 15px rgba(0,0,0,0.5); /* Тень блока */
+}
+
+/* Общие стили для кнопок */
+.button-left, .button-right {
+    width: 100%; /* Занимает всю доступную ширину */
+    height: 100%; /* Занимает всю доступную высоту */
+    margin: 5px; /* Внешние отступы */
+    color: white; /* Цвет текста */
+    border: 0px; /* Убирает границу */
+    border-radius: 30px; /* Закругление углов */
+    box-shadow:  0 0 15px rgba(0,0,0,0.5); /* Тень */
+    cursor: pointer; /* Курсор-указатель */
+    transition: all 0.3s ease; /* Анимация всех свойств */
+    transform-origin: center; /* Точка трансформации в центре */
+}
+
+/* Стили для левой кнопки */
+.button-left {
+    background: #AC3B61; /* Фоновый цвет */
+}
+
+/* Стили для правой кнопки */
+.button-right {
+    background: #123C69; /* Фоновый цвет */
+}
+
+/* Эффект при наведении на левую кнопку */
+.button-left:hover {
+    transform: scale(1.1); /* Увеличение на 10% */
+    background: red; /* Новый цвет фона */
+}
+
+/* Эффект при наведении на правую кнопку */
+.button-right:hover {
+    transform: scale(1.1); /* Увеличение на 10% */
+    background: blue; /* Новый цвет фона */
+}
+
+/* Эффект при нажатии на левую кнопку */
+.button-left:active {
+    background: darkred; /* Темный цвет фона */
+    transition: background-color 0.1s ease; /* Быстрая анимация */
+    box-shadow: inset 0 0 10px #000; /* Внутренняя тень */
+}
+
+/* Эффект при нажатии на правую кнопку */
+.button-right:active {
+    background: darkblue; /* Темный цвет фона */
+    transition: background-color 0.1s ease; /* Быстрая анимация */
+    box-shadow: inset 0 0 10px #000; /* Внутренняя тень */
+}
+
+/* Добавить в score.css */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: #EEE2DC;
+    padding: 10px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 0 25px rgba(0,0,0,0.5);
+    width: 80%;
+    max-width: 400px;
+}
+
+.modal h2 {
+    color: black;
+    margin-bottom: 20px;
+}
+
+.modal h3 {
+    color: black;
+    margin-bottom: 20px;
+}
+
+.modal-button {
+    width: 80%;
+    padding: 15px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 30px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    background: #AC3B61;
+}

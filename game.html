@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>КОМАНДЫ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/game.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <div class="container">
+        <div class="menu-button-block">
+            <button class="button-pause">СТОП</button>
+        </div>
+        <div class="main-text-block text-center"> 
+            <h1 id="gameTimer">00:00</h1> <!-- Начальное значение будет перезаписано JS -->
+        </div>
+        <div class="main-game-block">
+            <div class="score-block">
+                <h3>ОЧКИ</h3>
+                <h3>0</h3>
+            </div>
+            <div class="word-block">
+                <h3 class="front">СЛОВО</h3>
+                <h3 class="back">ALIAS</h3>
+            </div>
+            <h3 class="team-text" id="currentTeam">НАЗВАНИЕ КОМАНДЫ</h3>
+        </div>
+        <div class="button-block">
+            <button class="button-left">ПРОПУСТИТЬ</button>
+            <button class="button-right">ПРАВИЛЬНО</button>   
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="welcomeModal">
+        <div class="modal">
+            <h2>ДОБРО ПОЖАЛОВАТЬ В ИГРУ!</h2>
+            <p>Угадывайте слова и зарабатывайте очки</p>
+            <button class="modal-button" id="startGameButton">ГОТОВ</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <h2>ПАУЗА</h2>
+            <button class="modal-button" id="resumeButton">ПРОДОЛЖИТЬ</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="timeOver">
+        <div class="modal">
+            <h2>ПОСЛЕДНЕЕ СЛОВО</h2>
+            <button class="modal-button" id="resumeLastWordButton">ПРОДОЛЖИТЬ</button>
+        </div>
+    </div>
+
+    <!-- Добавьте этот код в game.html перед закрывающим тегом body -->
+    <div class="modal-overlay" id="teamSelectModal">
+        <div class="modal">
+            <h2>ВЫБЕРИТЕ КОМАНДУ</h2>
+            <div id="teamsListContainer"></div>
+        </div>
+    </div>
+
+    <script src="static/js/game.js"></script>
+</body>
+</html>

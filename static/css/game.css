@@ -1,0 +1,366 @@
+/* Устанавливаем основной шрифт для всего документа */
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+
+html, body {
+  overflow: hidden; /* Отключает скролл на странице */
+  height: 100%; /* Фиксирует высоту на весь экран */
+  margin: 0; /* Убирает стандартные отступы браузера */
+  padding: 0; /* Убирает стандартные внутренние отступы */
+  background: #EDC7B7; /* Устанавливает фоновый цвет */
+}
+
+/* Стили для основного контейнера */
+.container {
+    display: flex; /* Включает flex-разметку */
+    flex-direction: column; /* Располагает дочерние элементы в колонку */
+    justify-content: center; /* Выравнивает элементы по центру вертикально */
+    align-items: center; /* Выравнивает элементы по центру горизонтально */
+    height: 100vh; /* Занимает всю высоту viewport */
+    width: 90%; /* Ширина 90% от родителя */
+    max-width: 400px; /* Максимальная ширина */
+    margin: 0 auto; /* Центрирует контейнер */
+    gap: 10px; /* Расстояние между дочерними элементами */
+}
+
+.menu-button-block {
+    width: 90%;
+    height: 5vh;
+    padding: 15px;
+    background: #EEE2DC; /* Фоновый цвет */
+    display: flex; /* Включает flex-разметку */
+    justify-content: space-around; /* Распределяет пространство между кнопками */
+    align-items: center; /* Центрирует по вертикали */
+    border-radius: 35px; /* Закругление углов (только сверху) */
+    box-shadow: 0 0 15px rgba(0,0,0,0.5); /* Тень блока */
+}
+
+.button-pause {
+    width: 30%; /* Занимает всю доступную ширину */
+    height: 100%; /* Занимает всю доступную высоту */
+    margin: 5px; /* Внешние отступы */
+    color: white; /* Цвет текста */
+    border: 0px; /* Убирает границу */
+    border-radius: 30px; /* Закругление углов */
+    box-shadow: 0 0 15px rgba(0,0,0,0.5); /* Тень */
+    cursor: pointer; /* Курсор-указатель */
+    transition: all 0.3s ease; /* Анимация всех свойств */
+    transform-origin: center; /* Точка трансформации в центре */
+    background: orangered; /* Фоновый цвет */
+}
+
+/* Эффект при наведении на кнопку паузы */
+.button-pause:hover {
+    transform: scale(1.1); /* Увеличение на 10% */
+    background: orange; /* Новый цвет фона */
+}
+
+/* Эффект при нажатии на левую кнопку */
+.button-pause:active {
+    background: darkorange; /* Темный цвет фона */
+    transition: background-color 0.1s ease; /* Быстрая анимация */
+    box-shadow: inset 0 0 10px #000; /* Внутренняя тень */
+}
+
+/* Стили для блока с заголовком */
+.main-text-block {
+    width: 90%; /* Ширина 90% от родителя */
+    height: 5vh; /* Высота 5% от viewport */
+    background: #BAB2B5; /* Фоновый цвет */
+    padding: 15px; /* Внутренние отступы */
+    border-radius: 35px 35px 10px 10px; /* Закругление углов (только сверху) */
+    box-shadow: 0 0 15px rgba(0,0,0,0.5); /* Тень блока */
+}
+
+/* Стили для центрирования текста */
+.text-center {
+    display: flex; /* Включает flex-разметку */
+    justify-content: center; /* Центрирует по горизонтали */
+    align-items: center; /* Центрирует по вертикали */
+    color: white; /* Цвет текста */
+}
+
+/* Стили для блока с игрой */
+.main-game-block {
+    width: 90%; /* Ширина 90% от родителя */
+    height: 50vh; /* Высота 60% от viewport */
+    background: #EEE2DC; /* Фоновый цвет */
+    padding: 15px; /* Внутренние отступы */
+    box-shadow: 0 0 15px rgba(0,0,0,0.5); /* Тень блока */
+    border-radius: 10px 10px 10px 10px; /* Закругление углов (только сверху) */
+    display: flex; /* Включает flex-разметку */
+    flex-direction: column;  /* Располагает элементы в колонку */
+    align-items: center; /* Центрирует по вертикали */
+}
+
+.score-block {
+    display: flex; /* Включает flex-разметку */
+    flex-direction: row;  /* Располагает элементы в строку */
+    padding: 5px;
+}
+
+.score-block h3 {
+    margin: 10px;
+}
+
+/* Стили для центрирования текста */
+.team-text {
+    display: flex; /* Включает flex-разметку */
+    justify-content: center; /* Центрирует по горизонтали */
+    align-items: center; /* Центрирует по вертикали */
+    color: black; /* Цвет текста */
+}
+
+.word-block {
+    width: 80%;
+    height: 70%;
+    background: #ffffff; /* Фоновый цвет */
+    padding: 15px; /* Внутренние отступы */
+    display: flex; /* Включает flex-разметку */
+    justify-content: center; /* Центрирует по горизонтали */
+    align-items: center; /* Центрирует по вертикали */
+    border-radius: 10px 10px 10px 10px; /* Закругление углов (только снизу) */
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.5); /* Тень блока */
+    perspective: 1000px; /* Добавляем перспективу для 3D эффекта */
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+}
+
+.word-block.flipped {
+    transform: rotateY(180deg);
+}
+
+.word-block h3 {
+    backface-visibility: hidden;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    color: black;
+}
+
+.word-block .front {
+    transform: rotateY(0deg);
+}
+
+.word-block .back {
+    transform: rotateY(180deg);
+}
+
+.word-update {
+    animation: wordUpdate 0.3s ease-in-out;
+}
+
+@keyframes wordUpdate {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.5; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Стили для блока с кнопками */
+.button-block {
+    width: 90%; /* Ширина 90% от родителя */
+    height: 10vh; /* Высота 10% от viewport */
+    background: #BAB2B5; /* Фоновый цвет */
+    padding: 15px; /* Внутренние отступы */
+    display: flex; /* Включает flex-разметку */
+    justify-content: space-around; /* Распределяет пространство между кнопками */
+    align-items: center; /* Центрирует по вертикали */
+    border-radius: 10px 10px 35px 35px; /* Закругление углов (только снизу) */
+    box-shadow: 0 0 15px rgba(0,0,0,0.5); /* Тень блока */
+}
+
+/* Стиль для заблокированных кнопок */
+.button-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+/* Общие стили для кнопок */
+.button-left, .button-right {
+    width: 100%; /* Занимает всю доступную ширину */
+    height: 100%; /* Занимает всю доступную высоту */
+    margin: 5px; /* Внешние отступы */
+    color: white; /* Цвет текста */
+    border: 0px; /* Убирает границу */
+    border-radius: 30px; /* Закругление углов */
+    box-shadow: 0 0 15px rgba(0,0,0,0.5); /* Тень */
+    cursor: pointer; /* Курсор-указатель */
+    transition: all 0.3s ease; /* Анимация всех свойств */
+    transform-origin: center; /* Точка трансформации в центре */
+}
+
+/* Стили для левой кнопки */
+.button-left {
+    background: #AC3B61; /* Фоновый цвет */
+}
+
+/* Стили для правой кнопки */
+.button-right {
+    background: #123C69; /* Фоновый цвет */
+}
+
+/* Эффект при наведении на левую кнопку */
+.button-left:hover {
+    transform: scale(1.1); /* Увеличение на 10% */
+    background: red; /* Новый цвет фона */
+}
+
+/* Эффект при наведении на правую кнопку */
+.button-right:hover {
+    transform: scale(1.1); /* Увеличение на 10% */
+    background: blue; /* Новый цвет фона */
+}
+
+/* Эффект при нажатии на левую кнопку */
+.button-left:active {
+    background: darkred; /* Темный цвет фона */
+    transition: background-color 0.1s ease; /* Быстрая анимация */
+    box-shadow: inset 0 0 10px #000; /* Внутренняя тень */
+}
+
+/* Эффект при нажатии на правую кнопку */
+.button-right:active {
+    background: darkblue; /* Темный цвет фона */
+    transition: background-color 0.1s ease; /* Быстрая анимация */
+    box-shadow: inset 0 0 10px #000; /* Внутренняя тень */
+}
+
+#startGameButton {
+    background: #2ecc71;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5); /* Тень */
+}
+
+#startGameButton:hover {
+    transform: scale(1.1); /* Увеличение на 10% */
+    background: green;
+}
+
+#startGameButton:active {
+    background: darkgreen; /* Темный цвет фона */
+    transition: background-color 0.1s ease; /* Быстрая анимация */
+    box-shadow: inset 0 0 10px #000; /* Внутренняя тень */s
+}
+
+/* Стили для модального окна ПАУЗЫ*/
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: #EEE2DC;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 0 25px rgba(0,0,0,0.5);
+    width: 80%;
+    max-width: 400px;
+}
+
+.modal h2 {
+    color: #black;
+    margin-bottom: 20px;
+}
+
+.modal-button {
+    width: 80%;
+    padding: 15px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 30px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5); /* Тень */
+}
+
+/* Стили для модального окна выбора команды */
+.team-select-button {
+    width: 80%;
+    padding: 15px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 30px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    background: #AC3B61;
+}
+
+.team-select-button:hover {
+    transform: scale(1.05);
+    background: #c44d77;
+}
+
+.team-select-button:active {
+    background: #8a2c4d;
+    box-shadow: inset 0 0 10px #000;
+}
+
+#resumeButton, #resumeLastWordButton {
+    background: #123C69;
+}
+
+#exitButton {
+    background: #AC3B61;
+}
+
+#resumeButton:hover, #resumeLastWordButton:hover {
+    transform: scale(1.1); /* Увеличение на 10% */
+    background: blue; /* Новый цвет фона */
+}
+
+#exitButton:hover {
+    transform: scale(1.1); /* Увеличение на 10% */
+    background: red; /* Новый цвет фона */
+}
+
+#resumeButton:active, #resumeLastWordButton:active {
+    background: darkblue; /* Темный цвет фона */
+    transition: background-color 0.1s ease; /* Быстрая анимация */
+    box-shadow: inset 0 0 10px #000; /* Внутренняя тень */
+}
+
+#exitButton:active {
+    background: darkred; /* Темный цвет фона */
+    transition: background-color 0.1s ease; /* Быстрая анимация */
+    box-shadow: inset 0 0 10px #000; /* Внутренняя тень */s
+}
+
+#gameTimer {
+    font-size: 2.5rem;
+    color: white;
+    text-shadow: 0 0 10px rgba(172, 59, 97, 0.5);
+    margin: 0;
+    padding: 0;
+}
+
+/* Добавьте это, если хотите анимацию при изменении времени */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.001); }
+    100% { transform: scale(1); }
+}
+
+#gameTimer.changing {
+    animation: pulse 0.5s;
+}

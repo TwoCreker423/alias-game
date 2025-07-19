@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Результаты</title>
+    <link rel="stylesheet" href="static/css/score.css">
+</head>
+<body>
+    <div class="container">
+        <div class="main-text-block text-center"> 
+            <h1>РЕЗУЛЬТАТЫ</h1>
+        </div>
+        <div class="main-score-block">
+            <div class="score-block">
+                <h3>ОЧКИ ЗА РАУНД</h3>
+                <h3 id="finalScore">0</h3>
+            </div>
+            <!-- Блок для отображения всех команд и их очков -->
+            <div class="teams-list-block">
+                <h3>ЛИДЕРЫ</h3>
+                <div id="teamsScoresList"></div>
+            </div>
+            <!-- Блок для отображения следующей команды -->
+            <div class="next-team-block">
+                <h3>ДАЛЬШЕ</h3>
+                <h3 id="nextTeam">Команда не выбрана</h3>
+            </div>
+        </div>
+        <div class="button-block">
+            <button class="button-left">НАСТРОЙКИ</button>
+            <button class="button-right">ДАЛЬШЕ</button>  
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="winModal" style="display: none;">
+        <div class="modal">
+            <h2>ПОБЕДА</h2>
+            <h3 id="winningTeamName"></h3>
+            <h3 id="winningTeamScore"></h3>
+            <button class="modal-button" id="winModalButton">ОК</button>
+        </div>
+    </div>
+
+    <script src="static/js/score.js"></script>
+</body>
+</html>
