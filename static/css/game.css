@@ -3,6 +3,20 @@ body {
   font-family: 'Roboto', sans-serif;
 }
 
+/* Запрет выделения текста и элементов */
+body {
+  -webkit-user-select: none; /* Для Safari и iOS */
+  -moz-user-select: none;    /* Для Firefox */
+  -ms-user-select: none;     /* Для Internet Explorer/Edge */
+  user-select: none;         /* Стандартное свойство */
+  -webkit-tap-highlight-color: transparent; /* Убирает подсветку при нажатии на мобильных устройствах */
+}
+
+/* Запрет контекстного меню при долгом нажатии */
+body {
+  -webkit-touch-callout: none; /* Отключает вызов контекстного меню на iOS */
+}
+
 
 html, body {
   overflow: hidden; /* Отключает скролл на странице */
@@ -49,12 +63,6 @@ html, body {
     transition: all 0.3s ease; /* Анимация всех свойств */
     transform-origin: center; /* Точка трансформации в центре */
     background: orangered; /* Фоновый цвет */
-}
-
-/* Эффект при наведении на кнопку паузы */
-.button-pause:hover {
-    transform: scale(1.1); /* Увеличение на 10% */
-    background: orange; /* Новый цвет фона */
 }
 
 /* Эффект при нажатии на левую кнопку */
@@ -207,18 +215,6 @@ html, body {
     background: #123C69; /* Фоновый цвет */
 }
 
-/* Эффект при наведении на левую кнопку */
-.button-left:hover {
-    transform: scale(1.1); /* Увеличение на 10% */
-    background: red; /* Новый цвет фона */
-}
-
-/* Эффект при наведении на правую кнопку */
-.button-right:hover {
-    transform: scale(1.1); /* Увеличение на 10% */
-    background: blue; /* Новый цвет фона */
-}
-
 /* Эффект при нажатии на левую кнопку */
 .button-left:active {
     background: darkred; /* Темный цвет фона */
@@ -236,11 +232,6 @@ html, body {
 #startGameButton {
     background: #2ecc71;
     box-shadow: 0 0 15px rgba(0,0,0,0.5); /* Тень */
-}
-
-#startGameButton:hover {
-    transform: scale(1.1); /* Увеличение на 10% */
-    background: green;
 }
 
 #startGameButton:active {
@@ -306,11 +297,6 @@ html, body {
     background: #AC3B61;
 }
 
-.team-select-button:hover {
-    transform: scale(1.05);
-    background: #c44d77;
-}
-
 .team-select-button:active {
     background: #8a2c4d;
     box-shadow: inset 0 0 10px #000;
@@ -322,16 +308,6 @@ html, body {
 
 #exitButton {
     background: #AC3B61;
-}
-
-#resumeButton:hover, #resumeLastWordButton:hover {
-    transform: scale(1.1); /* Увеличение на 10% */
-    background: blue; /* Новый цвет фона */
-}
-
-#exitButton:hover {
-    transform: scale(1.1); /* Увеличение на 10% */
-    background: red; /* Новый цвет фона */
 }
 
 #resumeButton:active, #resumeLastWordButton:active {

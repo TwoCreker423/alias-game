@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const timerWarningSound = new Audio('static/sound/timer-warning.mp3');
     const backgroundMusic = new Audio('static/sound/background-music.mp3');
     backgroundMusic.loop = true;
-    backgroundMusic.volume = 0.01;
+    backgroundMusic.volume = 0.2;
 
     let lastClickTime = 0;
     const clickDelay = 1000; // 1 секунда задержки
@@ -263,28 +263,41 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Обработчик для кнопки "Пропустить"
     skipButton.addEventListener('click', function() {
-        playSkipSound();
-        const now = Date.now();
-        if (now - lastClickTime < clickDelay) return;
-        lastClickTime = now;
-        
-        skipButton.classList.add('button-disabled');
-        setTimeout(() => {
-            skipButton.classList.remove('button-disabled');
-        }, clickDelay);
-        
-        animateWordBlock();
-        
-        // Обновляем слово после анимации
-        setTimeout(() => {
-            updateWord();
-        }, 600);
-        
         if (isLastWord) {
+            playSkipSound();
+            const now = Date.now();
+            if (now - lastClickTime < clickDelay) return;
+            lastClickTime = now;
+            
+            skipButton.classList.add('button-disabled');
+            setTimeout(() => {
+                skipButton.classList.remove('button-disabled');
+            }, clickDelay);
+
             score -= 1;
             updateScore();
-            window.location.href = 'score.html';
+            setTimeout(() => {
+                window.location.href = 'score.html';
+            }, 500);
             return;
+        }
+        else {
+            playSkipSound();
+            const now = Date.now();
+            if (now - lastClickTime < clickDelay) return;
+            lastClickTime = now;
+            
+            skipButton.classList.add('button-disabled');
+            setTimeout(() => {
+                skipButton.classList.remove('button-disabled');
+            }, clickDelay);
+            
+            animateWordBlock();
+            
+            // Обновляем слово после анимации
+            setTimeout(() => {
+                updateWord();
+            }, 600);
         }
         
         if (penaltiesEnabled) {
@@ -294,28 +307,39 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Обработчик для кнопки "Правильно"
-    correctButton.addEventListener('click', function() {
-        playNextSound();
-        const now = Date.now();
-        if (now - lastClickTime < clickDelay) return;
-        lastClickTime = now;
-        
-        correctButton.classList.add('button-disabled');
-        setTimeout(() => {
-            correctButton.classList.remove('button-disabled');
-        }, clickDelay);
-        
-        animateWordBlock();
-        
-        // Обновляем слово после анимации
-        setTimeout(() => {
-            updateWord();
-        }, 600);
-        
+    correctButton.addEventListener('click', function() { 
         if (isLastWord) {
+            playNextSound();
+            const now = Date.now();
+            if (now - lastClickTime < clickDelay) return;
+            lastClickTime = now;
+            
+            correctButton.classList.add('button-disabled');
+            setTimeout(() => {
+                correctButton.classList.remove('button-disabled');
+            }, clickDelay);
+
             localStorage.setItem('currentTeamIndex', currentTeamIndex.toString());
             showTeamSelectionModal();
             return;
+        }
+        else {
+            playNextSound();
+            const now = Date.now();
+            if (now - lastClickTime < clickDelay) return;
+            lastClickTime = now;
+            
+            correctButton.classList.add('button-disabled');
+            setTimeout(() => {
+                correctButton.classList.remove('button-disabled');
+            }, clickDelay);
+            
+            animateWordBlock();
+            
+            // Обновляем слово после анимации
+            setTimeout(() => {
+                updateWord();
+            }, 600);
         }
         score += 1;
         updateScore();
