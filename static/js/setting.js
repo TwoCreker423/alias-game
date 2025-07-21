@@ -128,7 +128,7 @@ function hasTeamsData() {
     const teamsList = Object.keys(teamsWithRounds); // Массив названий команд
     
     // Проверяем, есть ли хотя бы одна команда и есть ли данные об очках
-    return teamsList && teamsList.length > 2; // teamsList.length > 2 потому что "[]" имеет длину 2
+    return teamsList && teamsList.length > 1; // teamsList.length > 2 потому что "[]" имеет длину 2
 }
 
 // Функция для обновления текста кнопки
