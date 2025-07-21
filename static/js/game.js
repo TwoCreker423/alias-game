@@ -111,10 +111,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (teamsList.length > 0) {
             const currentTeamName = teamsList[currentTeamIndex];
             teamTextElement.textContent = currentTeamName;
-            
-            // Всегда показываем 0 очков в начале раунда
-            score = 0;
-            updateScore();
         }
     }
 
