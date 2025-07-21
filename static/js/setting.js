@@ -124,11 +124,22 @@ playButton.addEventListener('click', function() {
 
 // Функция для проверки наличия данных о командах
 function hasTeamsData() {
-    const teamsWithRounds = JSON.parse(localStorage.getItem('teamsRounds')) || {};
-    const teamsList = Object.keys(teamsWithRounds); // Массив названий команд
+    // Проверяем teamsWithScores
+    const teamsWithScores = JSON.parse(localStorage.getItem('teamsWithScores')) || {};
+    const hasValidScores = Object.keys(teamsWithScores).length > 0 && 
+                          Object.values(teamsWithScores).some(score => score !== 0);
     
-    // Проверяем, есть ли хотя бы одна команда и есть ли данные об очках
-    return teamsList && teamsList.length > 1; // teamsList.length > 2 потому что "[]" имеет длину 2
+    // Проверяем teamsRounds
+    const teamsRounds = JSON.parse(localStorage.getItem('teamsRounds')) || {};
+    const hasValidRounds = Object.keys(teamsRounds).length > 0 && 
+                          Object.values(teamsRounds).some(rounds => rounds !== 0);
+    
+    // Проверяем currentTime
+    const currentTime = localStorage.getItem('currentTime');
+    const hasCurrentTime = currentTime !== null && currentTime > 0;
+    
+    // Возвращаем true только если все условия выполнены
+    return (hasValidScores && hasValidRounds) || hasCurrentTime;
 }
 
 // Функция для обновления текста кнопки
