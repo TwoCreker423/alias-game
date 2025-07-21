@@ -23,6 +23,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log('Очков до победы:', pointsToWin);
     console.log('roundsPlayed:', roundsPlayed);
+    console.log('LENGHT roundsPlayed:', roundsPlayed.length);
+    console.log('teamsList:', teamsList);
+    console.log('LENGHT teamsList:', teamsList.length);
     console.log('teamsScores:', teamsScores);
     console.log('savedScore:', savedScore);
 
@@ -30,24 +33,29 @@ document.addEventListener('DOMContentLoaded', function() {
     function checkWinConditions() {
         // Получаем минимальное количество сыгранных раундов среди всех команд
         const roundsValues = Object.values(roundsPlayed);
-        if (roundsValues.length === 0) return false;
-        
-        const minRounds = Math.min(...roundsValues);
+        console.log('LENGHT roundsValues:', roundsValues.length);
+        if (teamsList.length == roundsValues.length) {
 
-        // Проверяем каждую команду на соответствие условиям победы
-        for (const team in teamsScores) {
-            const teamScore = teamsScores[team];
-            const teamRounds = roundsPlayed[team] || 0;
+            if (roundsValues.length === 0) return false;
             
-            // Условия победы:
-            // 1. Очки команды >= pointsToWin
-            // 2. Количество раундов команды == минимальному количеству раундов среди всех команд
-            if (teamScore >= pointsToWin && teamRounds === minRounds) {
-                return {
-                    name: team,
-                    score: teamScore
-                };
+            const minRounds = Math.min(...roundsValues);
+
+            // Проверяем каждую команду на соответствие условиям победы
+            for (const team in teamsScores) {
+                const teamScore = teamsScores[team];
+                const teamRounds = roundsPlayed[team] || 0;
+                
+                // Условия победы:
+                // 1. Очки команды >= pointsToWin
+                // 2. Количество раундов команды == минимальному количеству раундов среди всех команд
+                if (teamScore >= pointsToWin && teamRounds === minRounds) {
+                    return {
+                        name: team,
+                        score: teamScore
+                    };
+                }
             }
+
         }
         
         return false;
