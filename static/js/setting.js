@@ -93,8 +93,8 @@ resetBtn.addEventListener('click', function() {
     localStorage.setItem('musicEnabled', true);
 
     // Удаляем данные о командах и их очках
-    localStorage.removeItem('teamsList');
-    localStorage.removeItem('teamsScores');
+    localStorage.removeItem('teamsWithScores');
+    localStorage.removeItem('teamsRounds');
     localStorage.removeItem('currentTeamIndex');
     localStorage.removeItem('currentScore');
     localStorage.removeItem('currentTime');
@@ -124,7 +124,8 @@ playButton.addEventListener('click', function() {
 
 // Функция для проверки наличия данных о командах
 function hasTeamsData() {
-    const teamsList = localStorage.getItem('teamsList');
+    const teamsWithRounds = JSON.parse(localStorage.getItem('teamsRounds')) || {};
+    const teamsList = Object.keys(teamsWithRounds); // Массив названий команд
     
     // Проверяем, есть ли хотя бы одна команда и есть ли данные об очках
     return teamsList && teamsList.length > 2; // teamsList.length > 2 потому что "[]" имеет длину 2

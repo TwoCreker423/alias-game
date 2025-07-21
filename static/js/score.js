@@ -9,53 +9,53 @@ document.addEventListener('DOMContentLoaded', function() {
     const winningTeamScore = document.getElementById('winningTeamScore');
     const winModalButton = document.getElementById('winModalButton');
     
-    // Показываем финальные очки
+    // Получаем данные из localStorage
     const savedScore = parseInt(localStorage.getItem('currentScore')) || 0;
-    finalScoreElement.textContent = savedScore;
-
-    // Получаем список команд и их очки
-    const teamsList = JSON.parse(localStorage.getItem('teamsList')) || [];
-    const teamsScores = JSON.parse(localStorage.getItem('teamsScores')) || {};
+    const teamsWithScores = JSON.parse(localStorage.getItem('teamsWithScores')) || {};
+    const teamsWithRounds = JSON.parse(localStorage.getItem('teamsRounds')) || {};
+    const teamsList = Object.keys(teamsWithScores);
     let currentTeamIndex = parseInt(localStorage.getItem('currentTeamIndex')) || 0;
-    const roundsPlayed = JSON.parse(localStorage.getItem('roundsPlayed')) || {};
     const pointsToWin = parseInt(localStorage.getItem('pointsValue')) || 50;
 
+    // Показываем очки за раунд
+    finalScoreElement.textContent = savedScore;
 
-    console.log('Очков до победы:', pointsToWin);
-    console.log('roundsPlayed:', roundsPlayed);
-    console.log('LENGHT roundsPlayed:', roundsPlayed.length);
-    console.log('teamsList:', teamsList);
-    console.log('LENGHT teamsList:', teamsList.length);
-    console.log('teamsScores:', teamsScores);
-    console.log('savedScore:', savedScore);
+    console.log('Текущие данные:');
+    console.log('Команды с очками:', teamsWithScores);
+    console.log('Команды с раундами:', teamsWithRounds);
+    console.log('Очки за раунд:', savedScore);
+    console.log('Текущая команда:', teamsList[currentTeamIndex]);
 
     // Функция для проверки условий победы
     function checkWinConditions() {
         // Получаем минимальное количество сыгранных раундов среди всех команд
-        const roundsValues = Object.values(roundsPlayed);
-        console.log('LENGHT roundsValues:', roundsValues.length);
-        if (teamsList.length == roundsValues.length) {
+        const roundsValues = Object.values(teamsWithRounds);
+        const scoreValues = Object.values(teamsWithScores);
+        if (roundsValues.length === 0) return false;
+        
+        const minRounds = Math.min(...roundsValues);
+        const maxValues = Math.max(...scoreValues);
 
-            if (roundsValues.length === 0) return false;
+        const countMaxValues = scoreValues.filter(item => item === maxValues);
+
+        console.log('countMaxValues: ', countMaxValues.length);
+
+        // Проверяем каждую команду на соответствие условиям победы
+        for (const team in teamsWithScores) {
+            const teamScore = teamsWithScores[team];
+            const teamRounds = teamsWithRounds[team] || 0;
             
-            const minRounds = Math.min(...roundsValues);
-
-            // Проверяем каждую команду на соответствие условиям победы
-            for (const team in teamsScores) {
-                const teamScore = teamsScores[team];
-                const teamRounds = roundsPlayed[team] || 0;
-                
-                // Условия победы:
-                // 1. Очки команды >= pointsToWin
-                // 2. Количество раундов команды == минимальному количеству раундов среди всех команд
-                if (teamScore >= pointsToWin && teamRounds === minRounds) {
-                    return {
-                        name: team,
-                        score: teamScore
-                    };
-                }
+            // Условия победы:
+            // 1. Очки команды >= pointsToWin
+            // 2. Количество раундов команды == минимальному количеству раундов среди всех команд
+            // 3. Очки команды == maxValues
+            // 4. Количество countMaxValues.length == 1
+            if (teamScore >= pointsToWin && teamScore == maxValues && teamRounds === minRounds && countMaxValues.length == 1) {
+                return {
+                    name: team,
+                    score: teamScore
+                };
             }
-
         }
         
         return false;
@@ -77,21 +77,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Отображаем список всех команд с их очками
     if (teamsList.length > 0) {
         let teamsHTML = '';
-        const updatedTeamsScores = {...teamsScores};
         
         // Создаем массив объектов {team, score} для сортировки
         const teamsForSorting = teamsList.map(team => {
-            let teamScore = updatedTeamsScores[team] || 0;
-            
-            // Добавляем очки текущего раунда для текущей команды
-            if (teamsList.indexOf(team) === currentTeamIndex) {
-                teamScore += savedScore;
-                updatedTeamsScores[team] = teamScore;
-            }
-            
             return {
                 name: team,
-                score: teamScore
+                score: teamsWithScores[team] || 0
             };
         });
         
@@ -104,13 +95,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const teamClass = isCurrentTeam ? 'current-team' : '';
             teamsHTML += `<div class="team-score-item ${teamClass}">
                 <span class="team-name">${team.name}</span>
-                <span class="team-score">${team.score}</span>
+                <span class="team-score"> ${team.score}</span>
               </div>`;
         });
         
         teamsScoresListElement.innerHTML = teamsHTML;
 
-        // Проверяем условия победы после обновления данных
+        // Проверяем условия победы
         const winner = checkWinConditions();
         if (winner) {
             showWinModal(winner);
@@ -126,24 +117,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Обработчик кнопки "ДАЛЬШЕ" (меняем команду и переходим в игру)
     nextButton.addEventListener('click', function() {
         if (teamsList.length > 0) {
-            // Сохраняем очки текущей команды
-            const currentTeam = teamsList[currentTeamIndex];
-            teamsScores[currentTeam] = (teamsScores[currentTeam] || 0) + parseInt(savedScore);
-            localStorage.setItem('teamsScores', JSON.stringify(teamsScores));
-            
-            // Увеличиваем индекс команды (с зацикливанием)
+            // Переключаем на следующую команду
             currentTeamIndex = (currentTeamIndex + 1) % teamsList.length;
             localStorage.setItem('currentTeamIndex', currentTeamIndex.toString());
         }
 
-        // Сбрасываем игровые данные только при переходе в игру
+        // Сбрасываем игровые данные
         resetGameData();
         window.location.href = 'game.html';
     });
     
     // Обработчик кнопки "Настройки"
     settingsButton.addEventListener('click', function() {
-        // Сбрасываем игровые данные только при переходе в настройки
+        // Сбрасываем игровые данные
         resetGameData();
         window.location.href = 'setting.html';
     });
@@ -153,5 +139,4 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.removeItem('currentTime');
         localStorage.removeItem('currentScore');
     }
-    
 });

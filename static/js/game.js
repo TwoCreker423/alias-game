@@ -10,14 +10,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const resumeLastWordButton = document.getElementById('resumeLastWordButton');
     const skipButton = document.querySelector('.button-left');
     const correctButton = document.querySelector('.button-right');
-    const scoreElement = document.querySelector('.score-block h3:nth-child(2)'); // Элемент с очками
-    const savedTeams = localStorage.getItem('teamsList');
-    const teamsList = savedTeams ? JSON.parse(savedTeams) : [];
-    const teamSelectModal = document.getElementById('teamSelectModal');
-    const teamsListContainer = document.getElementById('teamsListContainer');
-    let roundsPlayed = JSON.parse(localStorage.getItem('roundsPlayed')) || {};
+    const scoreElement = document.querySelector('.score-block h3:nth-child(2)');
+    const teamTextElement = document.getElementById('currentTeam');
+    
+    // Получаем данные из localStorage
+    const teamsWithScores = JSON.parse(localStorage.getItem('teamsWithScores')) || {};
+    const teamsWithRounds = JSON.parse(localStorage.getItem('teamsRounds')) || {};
+    const teamsList = Object.keys(teamsWithScores); // Массив названий команд
+    
+    let currentTeamIndex = parseInt(localStorage.getItem('currentTeamIndex')) || 0;
 
-    // Создаем аудио элемент для звука нажатия кнопки
+    // Создаем аудио элементы
     const buttonSound = new Audio('static/sound/button-click.mp3');
     const nextSound = new Audio('static/sound/correct.mp3');
     const skipSound = new Audio('static/sound/skip.mp3');
@@ -28,80 +31,68 @@ document.addEventListener('DOMContentLoaded', function() {
     backgroundMusic.volume = 0.2;
 
     let lastClickTime = 0;
-    const clickDelay = 1000; // 1 секунда задержки
+    const clickDelay = 1000;
 
-    console.log('Список команд:', teamsList);
+    console.log('currentTeamIndex:', currentTeamIndex);
+    console.log('Список команд с очками:', teamsWithScores);
+    console.log('Список команд с раундами:', teamsWithRounds);
 
-    //Получаем элемент для отображения названия команды
-    const teamTextElement = document.getElementById('currentTeam');
+    // Переменные для игры
+    let wordsList = [];
+    let usedWords = [];
+    let currentWord = "";
+    let timeLeft = 60;
+    let timerInterval;
+    let isGameRunning = false;
+    let isLastWord = false;
+    let score = 0;
+    let penaltiesEnabled = true;
 
-    // Загружаем текущий индекс команды (или 0, если нет сохраненного)
-    let currentTeamIndex = parseInt(localStorage.getItem('currentTeamIndex')) || 0;
-
-    // Добавляем в начало game.js (после других переменных)
-    let wordsList = []; // Список слов для игры
-    let usedWords = []; // Слова, которые уже использовались
-    let currentWord = ""; // Текущее слово
-
-    // Функция для воспроизведения звука кнопки
+    // Функция для воспроизведения звуков
     function playButtonSound() {
-        buttonSound.currentTime = 0; // Перематываем звук на начало
+        buttonSound.currentTime = 0;
         buttonSound.play().catch(e => console.log("Не удалось воспроизвести звук:", e));
     }
 
-    // Функция для воспроизведения звука кнопки
     function playSkipSound() {
-        skipSound.currentTime = 0; // Перематываем звук на начало
+        skipSound.currentTime = 0;
         skipSound.play().catch(e => console.log("Не удалось воспроизвести звук:", e));
     }
 
-    // Функция для воспроизведения звука кнопки
     function playNextSound() {
-        nextSound.currentTime = 0; // Перематываем звук на начало
+        nextSound.currentTime = 0;
         nextSound.play().catch(e => console.log("Не удалось воспроизвести звук:", e));
     }
 
-    // Функция для воспроизведения звука кнопки
     function playFlipSound() {
-        flipSound.currentTime = 0; // Перематываем звук на начало
+        flipSound.currentTime = 0;
         flipSound.play().catch(e => console.log("Не удалось воспроизвести звук:", e));
     }
 
-    // Функция для загрузки слов из localStorage
+    // Функция для загрузки слов
     function loadWords() {
-        // Пытаемся получить слова из URL (если игра начата из бота)
         const customWords = localStorage.getItem('customWords');
         if (customWords) {
             wordsList = JSON.parse(customWords);
             console.log('Загружены слова из URL:', wordsList);
         } else {
-            // Если нет слов из URL, можно загрузить стандартный набор
-            wordsList = ["СЛОВО1", "СЛОВО2", "СЛОВО3"]; // Замените на ваш стандартный набор
+            wordsList = ["СЛОВО1", "СЛОВО2", "СЛОВО3"];
             console.log('Используется стандартный набор слов');
         }
-        
-        // Инициализируем массив использованных слов
         usedWords = [];
     }
 
     // Функция для получения случайного слова
     function getRandomWord() {
-        // Если все слова использованы, начинаем заново
         if (usedWords.length === wordsList.length) {
             console.log('Все слова использованы, начинаем заново');
             usedWords = [];
         }
         
-        // Фильтруем неиспользованные слова
         const availableWords = wordsList.filter(word => !usedWords.includes(word));
-        
-        // Выбираем случайное слово из доступных
         const randomIndex = Math.floor(Math.random() * availableWords.length);
         currentWord = availableWords[randomIndex];
-        
-        // Добавляем слово в использованные
         usedWords.push(currentWord);
-        
         return currentWord;
     }
 
@@ -109,42 +100,36 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateWord() {
         const wordElement = document.querySelector('.word-block .front');
         wordElement.textContent = getRandomWord();
-        
-        // Для анимации можно добавить класс
         wordElement.classList.add('word-update');
         setTimeout(() => {
             wordElement.classList.remove('word-update');
         }, 300);
     }
-    
-    // Показываем текущую команду (без автоматического переключения)
-    if (teamsList.length > 0) {
-        teamTextElement.textContent = teamsList[currentTeamIndex];
+
+    // Обновляем название текущей команды
+    function updateCurrentTeam() {
+        if (teamsList.length > 0) {
+            const currentTeamName = teamsList[currentTeamIndex];
+            teamTextElement.textContent = currentTeamName;
+            
+            // Всегда показываем 0 очков в начале раунда
+            score = 0;
+            updateScore();
+        }
     }
 
-
-    // Переменные для таймера
-    let timeLeft = 60; // Значение по умолчанию
-    let timerInterval;
-    let isGameRunning = false;
-    let isLastWord = false; // Флаг для последнего слова
-    let score = 0; // Текущие очки
-    let penaltiesEnabled = true; // Штрафы включены по умолчанию
-
-    // Загружаем настройки штрафов
+    // Загружаем настройки
     function loadSettings() {
         const savedPenalties = localStorage.getItem('penaltyEnabled');
         if (savedPenalties !== null) {
             penaltiesEnabled = savedPenalties === 'true';
         }
         
-        // Загружаем сохраненное время
         const savedTime = localStorage.getItem('currentTime');
         if (savedTime) {
             timeLeft = parseInt(savedTime);
             gameTimer.textContent = formatTime(timeLeft);
         } else {
-            // Если нет сохраненного времени, берем из настроек
             const defaultTime = localStorage.getItem('timeValue');
             if (defaultTime) {
                 timeLeft = parseInt(defaultTime);
@@ -152,7 +137,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // Загружаем сохраненные очки
         const savedScore = localStorage.getItem('currentScore');
         if (savedScore !== null) {
             score = parseInt(savedScore);
@@ -160,13 +144,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Сохраняем текущее состояние игры
+    // Сохраняем состояние игры
     function saveGameState() {
         localStorage.setItem('currentTime', timeLeft.toString());
         localStorage.setItem('currentScore', score.toString());
     }
 
-    // Очищаем сохраненное состояние игры
+    // Очищаем сохраненное состояние
     function clearGameState() {
         localStorage.removeItem('currentTime');
         localStorage.removeItem('currentScore');
@@ -175,47 +159,29 @@ document.addEventListener('DOMContentLoaded', function() {
     // Обновляем отображение очков
     function updateScore() {
         scoreElement.textContent = score;
-        
-        if (score < 0) {
-            scoreElement.classList.add('negative');
-        } else {
-            scoreElement.classList.remove('negative');
-        }
-        
-        // Сохраняем очки
+        scoreElement.classList.toggle('negative', score < 0);
         saveGameState();
     }
 
-    // Функция для форматирования секунд в MM:SS
+    // Форматируем время
     function formatTime(seconds) {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
         return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
 
-    // Загружаем настройки времени из localStorage
-    function loadTimerSettings() {
-        const savedTime = localStorage.getItem('timeValue');
-        if (savedTime) {
-            timeLeft = parseInt(savedTime);
-            gameTimer.textContent = formatTime(timeLeft); // Используем функцию форматирования
-        }
-    }
-
-    // Функция старта таймера
+    // Запускаем таймер
     function startTimer() {
         isGameRunning = true;
         timerInterval = setInterval(function() {
             timeLeft--;
             gameTimer.textContent = formatTime(timeLeft);
 
-            // Воспроизводим звук предупреждения при 5 секундах
             if (timeLeft === 5) {
                 timerWarningSound.currentTime = 0;
                 timerWarningSound.play().catch(e => console.log("Не удалось воспроизвести звук таймера:", e));
             }
             
-            // Сохраняем текущее время
             saveGameState();
             
             gameTimer.classList.add('changing');
@@ -228,7 +194,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 clearInterval(timerInterval);
                 isGameRunning = false;
                 isLastWord = true;
-                // Обработчик для кнопки "Пропустить"
                 resumeLastWordButton.addEventListener('click', function() {
                     playButtonSound();
                     timeOver.style.display = 'none';
@@ -238,17 +203,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1000);
     }
 
-    // Функция паузы таймера
+    // Пауза таймера
     function pauseTimer() {
         clearInterval(timerInterval);
         timerWarningSound.pause();
         isGameRunning = false;
     }
 
-    // Функция сброса таймера (используется только когда нужно начать новую игру)
+    // Сброс таймера
     function resetTimer() {
         clearInterval(timerInterval);
-        // Останавливаем фоновую музыку
         backgroundMusic.pause();
         backgroundMusic.currentTime = 0;
         const defaultTime = localStorage.getItem('timeValue') || 60;
@@ -261,7 +225,64 @@ document.addEventListener('DOMContentLoaded', function() {
         clearGameState();
     }
 
-    // Обработчик для кнопки "Пропустить"
+    // Анимация блока слова
+    function animateWordBlock() {
+        playFlipSound();
+        const wordBlock = document.querySelector('.word-block');
+        wordBlock.classList.add('flipped');
+        
+        setTimeout(() => {
+            wordBlock.classList.remove('flipped');
+        }, 600);
+    }
+
+    // Показываем модальное окно выбора команды
+    function showTeamSelectionModal() {
+        const teamsListContainer = document.getElementById('teamsListContainer');
+        teamsListContainer.innerHTML = '';
+        
+        teamsList.forEach((team, index) => {
+            const teamButton = document.createElement('button');
+            teamButton.className = 'modal-button team-select-button';
+            teamButton.textContent = `${team}`;
+            teamButton.addEventListener('click', function() {
+                addPointToTeam(team, index);
+                window.location.href = 'score.html';
+            });
+            teamsListContainer.appendChild(teamButton);
+        });
+        
+        const teamSelectModal = document.getElementById('teamSelectModal');
+        teamSelectModal.style.display = 'flex';
+        timeOver.style.display = 'none';
+    }
+
+    // Добавляем очки команде и обновляем статистику раундов
+    function addPointToTeam(teamName) {
+        const roundScore = parseInt(localStorage.getItem('currentScore')) || 0;
+        // Обновляем количество раундов для команды
+        teamsWithRounds[teamsList[currentTeamIndex]] = (teamsWithRounds[teamsList[currentTeamIndex]] || 0) + 1;
+        localStorage.setItem('teamsRounds', JSON.stringify(teamsWithRounds));
+        
+        // Обновляем очки команды
+        if (teamName === teamsList[currentTeamIndex]) {
+            // Если выбрана текущая команда, добавляем все очки за раунд + 1 за последнее слово
+            localStorage.setItem('currentScore', (roundScore + 1).toString());
+            teamsWithScores[teamsList[currentTeamIndex]] = (teamsWithScores[teamsList[currentTeamIndex]] || 0) + roundScore + 1;
+        } else {
+            teamsWithScores[teamsList[currentTeamIndex]] = (teamsWithScores[teamsList[currentTeamIndex]] || 0) + roundScore;
+            // Если выбрана другая команда, добавляем только 1 очко за последнее слово
+            teamsWithScores[teamName] = (teamsWithScores[teamName] || 0) + 1;
+        }
+        
+        // Сохраняем обновленные данные
+        localStorage.setItem('teamsWithScores', JSON.stringify(teamsWithScores));
+        
+        console.log('Обновленные очки команд:', teamsWithScores);
+        console.log('Обновленные раунды команд:', teamsWithRounds);
+    }
+
+    // Обработчики событий
     skipButton.addEventListener('click', function() {
         if (isLastWord) {
             playSkipSound();
@@ -273,9 +294,18 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
                 skipButton.classList.remove('button-disabled');
             }, clickDelay);
-
+            
             score -= 1;
             updateScore();
+            // Обновляем количество раундов для выбранной команды
+            teamsWithRounds[teamsList[currentTeamIndex]] = (teamsWithRounds[teamsList[currentTeamIndex]] || 0) + 1;
+            localStorage.setItem('teamsRounds', JSON.stringify(teamsWithRounds));
+            // Сохраняем обновленные данные
+            const roundScore = parseInt(localStorage.getItem('currentScore')) || 0;
+            teamsWithScores[teamsList[currentTeamIndex]] = (teamsWithScores[teamsList[currentTeamIndex]] || 0) + roundScore;
+            localStorage.setItem('teamsWithScores', JSON.stringify(teamsWithScores));
+            console.log('Обновленные очки команд:', teamsWithScores);
+            console.log('Обновленные раунды команд:', teamsWithRounds);
             setTimeout(() => {
                 window.location.href = 'score.html';
             }, 500);
@@ -294,7 +324,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             animateWordBlock();
             
-            // Обновляем слово после анимации
             setTimeout(() => {
                 updateWord();
             }, 600);
@@ -306,7 +335,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Обработчик для кнопки "Правильно"
     correctButton.addEventListener('click', function() { 
         if (isLastWord) {
             playNextSound();
@@ -336,7 +364,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             animateWordBlock();
             
-            // Обновляем слово после анимации
             setTimeout(() => {
                 updateWord();
             }, 600);
@@ -345,90 +372,16 @@ document.addEventListener('DOMContentLoaded', function() {
         updateScore();
     });
 
-    // Функция для анимации переворота word-block
-    function animateWordBlock() {
-        playFlipSound();
-        const wordBlock = document.querySelector('.word-block');
-        wordBlock.classList.add('flipped');
-        
-        // После завершения анимации возвращаем в исходное состояние
-        setTimeout(() => {
-            wordBlock.classList.remove('flipped');
-            // Здесь можно добавить логику для смены слова
-        }, 600); // Должно совпадать с длительностью анимации в CSS
-    }
-
-
-    // Добавим новую функцию для показа модального окна с выбором команды
-    function showTeamSelectionModal() {
-        // Очищаем контейнер
-        teamsListContainer.innerHTML = '';
-        
-        // Получаем список команд
-        const teamsList = JSON.parse(localStorage.getItem('teamsList')) || [];
-        
-        // Создаем кнопки для каждой команды
-        teamsList.forEach(team => {
-            const teamButton = document.createElement('button');
-            teamButton.className = 'modal-button team-select-button';
-            teamButton.textContent = team;
-            teamButton.addEventListener('click', function() {
-                // Добавляем очко выбранной команде
-                addPointToTeam(team);
-                // Переходим на страницу результатов
-                window.location.href = 'score.html';
-            });
-            teamsListContainer.appendChild(teamButton);
-        });
-        
-        // Показываем модальное окно
-        teamSelectModal.style.display = 'flex';
-        timeOver.style.display = 'none';
-    }
-
-    // Функция для добавления очка команде
-    function addPointToTeam(teamName) {
-        const teamsScores = JSON.parse(localStorage.getItem('teamsScores')) || {};
-        const roundScore = parseInt(localStorage.getItem('currentScore')) || 0;
-
-        // Обновляем счетчик раундов
-        roundsPlayed[teamsList[currentTeamIndex]] = (roundsPlayed[teamsList[currentTeamIndex]] || 0) + 1;
-        localStorage.setItem('roundsPlayed', JSON.stringify(roundsPlayed));
-        
-        // Выводим в консоль статистику по раундам
-        console.log('Статистика по раундам:', roundsPlayed);
-        
-        // Добавляем очки за раунд ТОЛЬКО если выбрана текущая команда
-        if (teamName === teamsList[currentTeamIndex]) {
-            // Текущая команда получает все очки за раунд + 1 за последнее слово
-            teamsScores[teamName] = (teamsScores[teamName] || 0) + roundScore + 1;
-            console.log(roundScore);
-            // Сохраняем общее количество очков за раунд
-            localStorage.setItem('currentScore', (roundScore + 1).toString());
-        } else {
-            // Другая команда получает только 1 очко за последнее слово
-            teamsScores[teamName] = (teamsScores[teamName] || 0) + 1;
-            // Сохраняем только 1 очко за раунд (только за последнее слово)
-            localStorage.setItem('teamsScores', JSON.stringify(teamsScores));
-        }
-        
-
-    }
-
-    // Обработчик для кнопки "Начать игру"
     startGameButton.addEventListener('click', function() {
         playButtonSound();
         welcomeModal.style.display = 'none';
 
-        // Проверяем настройки музыки и воспроизводим, если включено
         const musicEnabled = localStorage.getItem('musicEnabled') === 'true';
         if (musicEnabled) {
             backgroundMusic.play().catch(e => console.log("Не удалось воспроизвести фоновую музыку:", e));
         }
         
-        // Не сбрасываем таймер, если игра уже идет (после перезагрузки)
         if (!isGameRunning) {
-            // Если есть сохраненное состояние - продолжаем его
             const savedTime = localStorage.getItem('currentTime');
             const savedScore = localStorage.getItem('currentScore');
             
@@ -438,7 +391,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 gameTimer.textContent = formatTime(timeLeft);
                 updateScore();
             } else {
-                // Иначе начинаем новую игру
                 const defaultTime = localStorage.getItem('timeValue') || 60;
                 timeLeft = parseInt(defaultTime);
                 score = 0;
@@ -450,24 +402,20 @@ document.addEventListener('DOMContentLoaded', function() {
         startTimer();
     });
     
-    // Обработчик для кнопки паузы
     pauseButton.addEventListener('click', function() {
         playButtonSound();
         if (isGameRunning) {
             if (timeLeft > 0) {
                 pauseTimer();
-                // Ставим музыку на паузу
                 backgroundMusic.pause();
             }
             modalOverlay.style.display = 'flex';
         }
     });
     
-    // Обработчик для кнопки "Продолжить"
     resumeButton.addEventListener('click', function() {
         playButtonSound();
         modalOverlay.style.display = 'none';
-        // Возобновляем музыку, если она включена в настройках
         const musicEnabled = localStorage.getItem('musicEnabled') === 'true';
         if (musicEnabled) {
             backgroundMusic.play().catch(e => console.log("Не удалось возобновить фоновую музыку:", e));
@@ -475,7 +423,6 @@ document.addEventListener('DOMContentLoaded', function() {
         startTimer();
     });
     
-    // Закрытие модального окна при клике вне его
     modalOverlay.addEventListener('click', function(e) {
         playButtonSound();
         if (e.target === modalOverlay) {
@@ -486,12 +433,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Загружаем настройки при старте
+    // Инициализация игры
     loadSettings();
-    updateScore(); // Инициализируем отображение очков
-    // В обработчике DOMContentLoaded, после loadSettings()
     loadWords();
-    // И в обработчике кнопки "Начать игру", после welcomeModal.style.display = 'none';
-    updateWord(); // Показываем первое слово
+    updateCurrentTeam();
+    updateScore();
+    updateWord();
     welcomeModal.style.display = 'flex';
 });

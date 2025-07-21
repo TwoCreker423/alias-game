@@ -147,7 +147,7 @@ class ChangeableText {
         this.textElement.textContent = newText;
         this.saveToLocalStorage();
         
-        // Обновляем общий список команд
+        // Обновляем общий список команд и их очки
         TeamManager.updateTeamsListInStorage();
     }
 
@@ -184,6 +184,8 @@ class ChangeableText {
     saveToLocalStorage() {
         const teamId = this.textElement.parentElement.id; // Получаем ID из родителя
         localStorage.setItem(teamId, this.textElement.textContent);
+        // Обновляем очки команды (если их нет - устанавливаем 0)
+        TeamManager.updateTeamScore(this.textElement.textContent, 0);
     }
 }
 
@@ -204,13 +206,47 @@ class TeamManager {
         this.addTeamBtn.addEventListener('click', () => this.addNewTeam());
     }
 
-    // Метод для получения списка команд
-    static getTeamsList() {
-        return Object.keys(localStorage)
+    // Метод для получения списка команд с их очками
+    static getTeamsWithScores() {
+        const teams = {};
+        Object.keys(localStorage)
             .filter(key => key.startsWith('team-'))
             .sort()
-            .map(key => localStorage.getItem(key))
-            .filter(Boolean); // Фильтруем возможные null/undefined
+            .forEach(key => {
+                const teamName = localStorage.getItem(key);
+                if (teamName) {
+                    // Получаем очки команды или устанавливаем 0, если их нет
+                    teams[teamName] = parseInt(localStorage.getItem(`score-${teamName}`)) || 0;
+                }
+            });
+        return teams;
+    }
+
+    // Метод для получения списка команд с количеством раундов
+    static getTeamsWithRounds() {
+        const teamsRounds = JSON.parse(localStorage.getItem('teamsRounds')) || {};
+        // Обновляем список, добавляя новые команды с 0 раундов
+        Object.keys(localStorage)
+            .filter(key => key.startsWith('team-'))
+            .forEach(key => {
+                const teamName = localStorage.getItem(key);
+                if (teamName && !teamsRounds.hasOwnProperty(teamName)) {
+                    teamsRounds[teamName] = 0;
+                }
+            });
+        return teamsRounds;
+    }
+
+    // Метод для обновления очков команды
+    static updateTeamScore(teamName, score) {
+        localStorage.setItem(`score-${teamName}`, score.toString());
+    }
+
+    // Метод для обновления количества раундов команды
+    static updateTeamRounds(teamName, rounds) {
+        const teamsRounds = this.getTeamsWithRounds();
+        teamsRounds[teamName] = rounds;
+        localStorage.setItem('teamsRounds', JSON.stringify(teamsRounds));
     }
 
     loadTeams() {
@@ -223,6 +259,11 @@ class TeamManager {
             savedTeams.forEach(teamId => {
                 const savedText = localStorage.getItem(teamId);
                 this.createTeamElement(teamId, savedText);
+                // Устанавливаем начальные значения (0) для загруженной команды
+                if (savedText) {
+                    TeamManager.updateTeamScore(savedText, 0);
+                    TeamManager.updateTeamRounds(savedText, 0);
+                }
             });
             
             // Добавляем недостающие команды до минимального количества
@@ -237,16 +278,18 @@ class TeamManager {
         }
     }
 
-    // Статический метод для обновления списка команд в localStorage
-    static updateTeamsListInStorage() {
-        const teamsList = this.getTeamsList();
-        localStorage.setItem('teamsList', JSON.stringify(teamsList));
+    // Статический метод для обновления списков команд в localStorage
+    static updateTeamsListsInStorage() {
+        const teamsWithScores = this.getTeamsWithScores();
+        const teamsWithRounds = this.getTeamsWithRounds();
+        
+        localStorage.setItem('teamsWithScores', JSON.stringify(teamsWithScores));
+        localStorage.setItem('teamsRounds', JSON.stringify(teamsWithRounds));
     }
 
-    // Добавляем метод для сохранения списка команд
-    saveTeamsList() {
-        const teamsList = TeamManager.getTeamsList();
-        localStorage.setItem('teamsList', JSON.stringify(teamsList));
+    // Добавляем метод для сохранения списков команд
+    saveTeamsLists() {
+        TeamManager.updateTeamsListsInStorage();
     }
 
     createTeamElement(teamId, initialText = '') {
@@ -265,7 +308,7 @@ class TeamManager {
         deleteBtn.addEventListener('click', () => this.removeTeam(teamItem));
 
         deleteBtn.addEventListener('click', function() {
-            playButtonSound(); // Воспроизводим звук
+            playButtonSound();
         });
         
         teamItem.appendChild(textElement);
@@ -273,10 +316,9 @@ class TeamManager {
         
         this.teamsContainer.insertBefore(teamItem, this.addTeamBtn);
         
-        // Создаем экземпляр ChangeableText - текст сохранится автоматически в конструкторе
         const team = new ChangeableText(
             textElement,
-            initialText // Передаем либо сохраненный текст, либо undefined (будет случайный)
+            initialText
         );
         
         this.teams.push({
@@ -286,14 +328,14 @@ class TeamManager {
         });
         
         this.updateButtonsVisibility();
-        this.saveTeamsList();
+        this.saveTeamsLists();
     }
 
     addNewTeam() {
         if (this.teams.length >= this.maxTeams) return;
         
         const newId = `team-${Date.now()}`;
-        this.createTeamElement(newId); // Текст сохранится автоматически
+        this.createTeamElement(newId);
     }
 
     removeTeam(teamElement) {
@@ -301,25 +343,27 @@ class TeamManager {
         
         const teamIndex = this.teams.findIndex(t => t.element === teamElement);
         if (teamIndex !== -1) {
-            // Удаляем из DOM
-            teamElement.remove();
+            const teamName = this.teams[teamIndex].text.textElement.textContent;
             
-            // Удаляем из массива
+            teamElement.remove();
             const [removedTeam] = this.teams.splice(teamIndex, 1);
             
-            // Удаляем из localStorage
             localStorage.removeItem(removedTeam.id);
+            localStorage.removeItem(`score-${teamName}`);
+            
+            // Удаляем информацию о раундах для этой команды
+            const teamsRounds = TeamManager.getTeamsWithRounds();
+            delete teamsRounds[teamName];
+            localStorage.setItem('teamsRounds', JSON.stringify(teamsRounds));
             
             this.updateButtonsVisibility();
-            this.saveTeamsList();
+            this.saveTeamsLists();
         }
     }
 
     updateButtonsVisibility() {
-        // Показываем/скрываем кнопку добавления
         this.addTeamBtn.style.display = this.teams.length >= this.maxTeams ? 'none' : 'block';
         
-        // Показываем/скрываем кнопки удаления
         this.teams.forEach(team => {
             const deleteBtn = team.element.querySelector('.delete-team-btn');
             if (deleteBtn) {
@@ -334,6 +378,7 @@ let teamManager;
 document.addEventListener('DOMContentLoaded', () => {
     new TeamManager();
 
-// Для тестирования - выводим список команд в консоль
-    console.log('Список команд:', TeamManager.getTeamsList());
+    // Выводим в консоль оба списка
+    console.log('Список команд с очками:', TeamManager.getTeamsWithScores());
+    console.log('Список команд с раундами:', TeamManager.getTeamsWithRounds());
 });
