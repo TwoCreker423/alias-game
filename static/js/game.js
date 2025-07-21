@@ -314,8 +314,10 @@ document.addEventListener('DOMContentLoaded', function() {
             lastClickTime = now;
             
             skipButton.classList.add('button-disabled');
+            correctButton.classList.add('button-disabled');
             setTimeout(() => {
                 skipButton.classList.remove('button-disabled');
+                correctButton.classList.remove('button-disabled');
             }, clickDelay);
             
             animateWordBlock();
@@ -353,8 +355,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (now - lastClickTime < clickDelay) return;
             lastClickTime = now;
             
+            skipButton.classList.add('button-disabled');
             correctButton.classList.add('button-disabled');
             setTimeout(() => {
+                skipButton.classList.remove('button-disabled');
                 correctButton.classList.remove('button-disabled');
             }, clickDelay);
             
